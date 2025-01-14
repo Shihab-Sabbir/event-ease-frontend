@@ -40,14 +40,17 @@ const Dashboard = () => {
     // Fetch events from backend
     const fetchEvents = async () => {
         try {
-            let filter = "/event";
-            if (user) {
-                filter = `/event?creatorId=${user.email}`;
-            }
-            const response = await apiCall(filter, "GET");
+            // let filter = "/event";
+            // if (user) {
+            //     filter = `/event?creatorId=${user.email}`;
+            // }
+            const response = await apiCall("/event", "GET");
             setEvents(response?.data);
             if (user) {
+                setEvents([])
                 const registedEventData = response?.data?.filter(event => event.attendees.includes(user.email));
+                const createdByUser = response?.data?.filter(event => event.createdBy === user.email)
+                setEvents(createdByUser);
                 setRegistedEvent(registedEventData)
             }
         } catch (err) {
@@ -159,7 +162,7 @@ const Dashboard = () => {
                         {user
                             ? events.length > 0
                                 ? `You have created ${events.length} event${events.length !== 1 ? 's' : ''}.`
-                                : 'You have no events yet.'
+                                : "You haven't created any events yet."
                             : events.length > 0
                                 ? `There are ${events.length} event${events.length !== 1 ? 's' : ''}.`
                                 : 'No events available yet.'}
@@ -190,22 +193,6 @@ const Dashboard = () => {
                 />
             )}
 
-            {/* Show message if no events */}
-            {!isLoading && events.length === 0 && (
-                <div className="text-center mb-6">
-                    <p>{user ? "You haven't created any events yet." : "No events available yet."}</p>
-                    {user && (
-                        <Button onClick={() => document.getElementById('create-event-button').click()} className="mt-4">
-                            Create Your First Event
-                        </Button>
-                    )}
-                    {!user && (
-                        <p className="mt-4">
-                            Please <a href="/auth/login" className="text-blue-500">log in</a> to create an event.
-                        </p>
-                    )}
-                </div>
-            )}
 
             {isLoading ? (
                 <EventCardLoader />

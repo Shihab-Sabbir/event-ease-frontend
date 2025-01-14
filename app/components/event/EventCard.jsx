@@ -6,7 +6,7 @@ import { CalendarIcon, MapPinIcon, UsersIcon, UserIcon, PencilIcon, TrashIcon } 
 export default function EventCard({ event, user, registerForEvent, setSelectedEvent, deleteEvent }) {
     return (
         <Card key={event._id} className="flex flex-col shadow-lg border rounded-lg overflow-hidden">
-            <CardHeader className="bg-primary text-white p-4">
+            <CardHeader className="bg-gray-600 text-white p-4">
                 <CardTitle className="text-xl font-bold">{event.name}</CardTitle>
             </CardHeader>
             <CardContent className="flex-grow p-4 space-y-4">
@@ -29,7 +29,7 @@ export default function EventCard({ event, user, registerForEvent, setSelectedEv
                     <span className="font-medium">Created by {event.createdBy}</span>
                 </div>
             </CardContent>
-            <CardFooter className="p-4 bg-gray-50 flex justify-between items-center">
+            <CardFooter className="p-4 bg-gray-50 flex gap-2 justify-between items-center">
                 <Button
                     onClick={() => registerForEvent(event._id)}
                     disabled={event.attendees.length >= event.maxAttendees}
