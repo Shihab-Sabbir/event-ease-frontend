@@ -66,9 +66,10 @@ const LoginPage = () => {
                     </CardContent>
                     <CardFooter>
                         <p className="text-sm text-gray-500 text-center w-full">
-                            Don't have an account? <a href="/auth/signup" className="text-blue-500 hover:underline">Sign up</a>
+                            Don&#39;t have an account? <a href="/auth/signup" className="text-blue-500 hover:underline">Sign up</a>
                         </p>
                     </CardFooter>
+
                 </Card>
             </div>
             {/* Right half - Login Form */}

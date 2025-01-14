@@ -29,7 +29,7 @@ const CreateEventModal = ({ newEvent, setNewEvent, isLoading, createEvent }) => 
                 <DialogHeader>
                     <DialogTitle className="text-xl font-semibold uppercase pb-">Create New Event</DialogTitle>
                     <DialogDescription>
-                        Fill in the details below to create a new event. Click create when you're done.
+                        Fill in the details below to create a new event. Click create when you&#39;re done.
                     </DialogDescription>
                 </DialogHeader>
 
@@ -60,7 +60,7 @@ const CreateEventModal = ({ newEvent, setNewEvent, isLoading, createEvent }) => 
                                 <Input
                                     id="date"
                                     type="date"
-                                    placeholder='DD-MMM-YYYY'
+                                    placeholder="DD-MMM-YYYY"
                                     value={newEvent.date}
                                     onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
                                     className="w-full pl-10"

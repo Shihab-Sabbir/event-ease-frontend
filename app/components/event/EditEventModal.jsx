@@ -50,8 +50,9 @@ const EditEventModal = ({ event, updateEvent, setSelectedEvent }) => {
                 <DialogHeader>
                     <DialogTitle className="text-xl font-semibold uppercase pb-2">Edit Event</DialogTitle>
                     <DialogDescription>
-                        Make changes to your event here. Click save when you're done.
+                        Make changes to your event here. Click save when you&#39;re done.
                     </DialogDescription>
+
                 </DialogHeader>
 
                 <form
