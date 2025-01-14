@@ -15,6 +15,7 @@ import Link from "next/link";
 
 const Dashboard = () => {
     const { user, logout, checkUser } = useUser();
+    const [registedEvent, setRegistedEvent] = useState([]);
     const [events, setEvents] = useState([]);
     const [newEvent, setNewEvent] = useState({
         name: "",
@@ -43,13 +44,16 @@ const Dashboard = () => {
             }
             const response = await apiCall(filter, "GET");
             setEvents(response?.data);
+            if (user) {
+                const registedEventData = response?.data?.filter(event => event.attendees.includes(user.email));
+                setRegistedEvent(registedEventData)
+            }
         } catch (err) {
             toast.error(err.message || "Failed to fetch events.");
         } finally {
             setIsLoading(false);
         }
     };
-
 
     useEffect(() => {
         setIsLoading(true);
@@ -142,17 +146,17 @@ const Dashboard = () => {
 
     return (
         <div className="max-w-4xl mx-auto mt-8">
-            {!isLoading && <h1 className="text-3xl font-semibold text-center mb-6">
+            {!isLoading && <h1 className="text-3xl font-semibold  mb-6">
                 {user ? `Welcome, ${user.email}!` : "Welcome to the Event Dashboard"}
             </h1>}
 
             {/* Event count */}
             {!isLoading && (
-                <div className="text-center mb-6">
+                <div className="mb-6">
                     <h2 className="text-xl">
                         {user
                             ? events.length > 0
-                                ? `You have ${events.length} event${events.length !== 1 ? 's' : ''}.`
+                                ? `You have created ${events.length} event${events.length !== 1 ? 's' : ''}.`
                                 : 'You have no events yet.'
                             : events.length > 0
                                 ? `There are ${events.length} event${events.length !== 1 ? 's' : ''}.`
@@ -160,7 +164,6 @@ const Dashboard = () => {
                     </h2>
                 </div>
             )}
-
 
             {user?.email ? (
                 <CreateEventModal
@@ -171,7 +174,7 @@ const Dashboard = () => {
                     buttonId="create-event-button"
                 />
             ) : (
-                <div className="text-center mt-6">
+                <div className="text-start mt-6">
                     <p className="text-lg">To create an event, please <Link href="/auth/login" className="text-blue-600">login</Link>.</p>
                 </div>
             )}
@@ -228,67 +231,97 @@ const Dashboard = () => {
                 </div>
             ) : (
                 // Event List
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-                    {events?.map((event) => (
-                        <Card key={event._id} className="flex flex-col">
-                            <CardHeader>
-                                <CardTitle className="text-xl font-semibold">{event.name}</CardTitle>
-                            </CardHeader>
-                            <CardContent className="flex-grow">
-                                <div className="space-y-2">
+                <div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+                        {events?.map((event) => (
+                            <Card key={event._id} className="flex flex-col shadow-lg border rounded-lg overflow-hidden">
+                                <CardHeader className="bg-gray-700 text-white p-4">
+                                    <CardTitle className="text-xl font-bold">{event.name}</CardTitle>
+                                </CardHeader>
+                                <CardContent className="flex-grow p-4 space-y-4">
                                     <div className="flex items-center text-sm text-muted-foreground">
-                                        <CalendarIcon className="mr-2 h-4 w-4" />
-                                        <span>{new Date(event.date).toLocaleDateString()}</span>
+                                        <CalendarIcon className="mr-2 h-5 w-5 text-primary" />
+                                        <span className="font-medium">{new Date(event.date).toLocaleDateString()}</span>
                                     </div>
                                     <div className="flex items-center text-sm text-muted-foreground">
-                                        <MapPinIcon className="mr-2 h-4 w-4" />
-                                        <span>{event.location}</span>
+                                        <MapPinIcon className="mr-2 h-5 w-5 text-primary" />
+                                        <span className="font-medium">{event.location}</span>
                                     </div>
                                     <div className="flex items-center text-sm text-muted-foreground">
-                                        <UsersIcon className="mr-2 h-4 w-4" />
-                                        <span>{event.attendees.length} / {event.maxAttendees} attendees</span>
+                                        <UsersIcon className="mr-2 h-5 w-5 text-primary" />
+                                        <span className="font-medium">
+                                            {event.attendees.length} / {event.maxAttendees} attendees
+                                        </span>
                                     </div>
                                     <div className="flex items-center text-sm text-muted-foreground">
-                                        <UserIcon className="mr-2 h-4 w-4" />
-                                        <span>Created by {event.createdBy}</span>
+                                        <UserIcon className="mr-2 h-5 w-5 text-primary" />
+                                        <span className="font-medium">Created by {event.createdBy}</span>
                                     </div>
-                                </div>
-                            </CardContent>
-                            <CardFooter>
-                                <div className="flex items-center w-full gap-4">
+                                </CardContent>
+                                <CardFooter className="p-4 bg-gray-50 flex justify-between items-center gap-2">
                                     <Button
                                         onClick={() => registerForEvent(event._id)}
                                         disabled={event.attendees.length >= event.maxAttendees}
-                                        className="w-full"
+                                        className={`w-full ${event.attendees.length >= event.maxAttendees
+                                            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                            : "bg-primary text-white hover:bg-primary-dark"
+                                            }`}
                                     >
-                                        {event.attendees.length >= event.maxAttendees
-                                            ? "Event Full"
-                                            : "Register"}
+                                        {event.attendees.length >= event.maxAttendees ? "Event Full" : "Register"}
                                     </Button>
                                     {user && event.createdBy === user.email && (
-                                        <>
+                                        <div className="flex gap-2">
                                             <Button
                                                 onClick={() => setSelectedEvent(event)}
-                                                className="px-5 border"
-                                                variant="default"
+                                                className="p-2 bg-gray-200 hover:bg-gray-300 rounded-md"
                                                 size="icon"
                                             >
-                                                <PencilIcon className="h-4 w-4" />
+                                                <PencilIcon className="h-5 w-5 text-gray-700" />
                                             </Button>
                                             <Button
                                                 onClick={() => deleteEvent(event._id)}
-                                                className="px-5 border"
-                                                variant="destructive"
+                                                className="p-2 bg-red-100 hover:bg-red-200 rounded-md"
                                                 size="icon"
                                             >
-                                                <TrashIcon className="h-4 w-4" />
+                                                <TrashIcon className="h-5 w-5 text-red-500" />
                                             </Button>
-                                        </>
+                                        </div>
                                     )}
+                                </CardFooter>
+                            </Card>
+
+                        ))}
+                    </div>
+                    <div className="mt-6">
+                        {user?.email && <div>
+                            {registedEvent?.length > 0 ? (
+                                <div className="mt-6">
+                                    <h2 className="text-xl font-semibold mb-4">Your Registered Events</h2>
+                                    <table className="table-auto w-full border-collapse border border-gray-300">
+                                        <thead>
+                                            <tr className="bg-gray-200">
+                                                <th className="border border-gray-300 px-4 py-2">Event Name</th>
+                                                <th className="border border-gray-300 px-4 py-2">Date</th>
+                                                <th className="border border-gray-300 px-4 py-2">Location</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {registedEvent.map(event => (
+                                                <tr key={event._id}>
+                                                    <td className="border border-gray-300 px-4 py-2">{event.name}</td>
+                                                    <td className="border border-gray-300 px-4 py-2">{new Date(event.date).toLocaleDateString()}</td>
+                                                    <td className="border border-gray-300 px-4 py-2">{event.location}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
                                 </div>
-                            </CardFooter>
-                        </Card>
-                    ))}
+                            ) : (
+                                <p>You do not have any registrations yet!</p>
+                            )}
+
+                        </div>}
+                    </div>
                 </div>
             )}
         </div>
