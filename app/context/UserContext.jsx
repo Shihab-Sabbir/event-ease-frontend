@@ -22,6 +22,7 @@ export const UserProvider = ({ children }) => {
             }
         })();
         setUser(currentUser);
+        return currentUser
     };
 
 
@@ -29,6 +30,7 @@ export const UserProvider = ({ children }) => {
         setLoading(true);
         try {
             const response = await apiCall("/auth/login", "POST", { user: { email, password } });
+            console.log({ response })
             setUser({ email: email, token: response.token });
             localStorage.setItem(
                 "event-ease-token",

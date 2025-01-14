@@ -1,6 +1,8 @@
 
 import { Toaster } from "react-hot-toast";
 import { UserProvider } from "./context/UserContext";
+import './globals.css'
+import Navbar from "./components/navbar/Navbar";
 
 export const metadata = {
   title: "EventEase",

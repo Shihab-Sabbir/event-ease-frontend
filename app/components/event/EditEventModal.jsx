@@ -1,7 +1,8 @@
-'use client'
+'use client';
 
-import React from "react";
-import { CalendarIcon, MapPinIcon, UsersIcon } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { CalendarIcon, MapPinIcon, UsersIcon, PencilIcon } from 'lucide-react';
+import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -16,27 +17,50 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-const CreateEventModal = ({ newEvent, setNewEvent, isLoading, createEvent }) => {
+const EditEventModal = ({ event, updateEvent, setSelectedEvent }) => {
+    const formatDate = (date) => {
+        const d = new Date(date);
+        return d.toISOString().split('T')[0]; // Formats date as 'yyyy-mm-dd'
+    };
+
+    const [updatedEvent, setUpdatedEvent] = useState({
+        name: event.name,
+        date: formatDate(event.date), // Format the date here
+        location: event.location,
+        maxAttendees: event.maxAttendees,
+    });
+
+    useEffect(() => {
+        setUpdatedEvent({
+            name: event.name,
+            date: formatDate(event.date), // Format the date here
+            location: event.location,
+            maxAttendees: event.maxAttendees,
+        });
+    }, [event]);
+
     return (
-        <Dialog>
-            <DialogTrigger asChild>
-                <Button variant="default">
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    Create Event
+        <Dialog open={!!event} onOpenChange={(open) => !open && setSelectedEvent(null)}>
+            <DialogTrigger>
+                <Button variant="outline" size="icon">
+                    <PencilIcon className="h-4 w-4" />
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent >
                 <DialogHeader>
-                    <DialogTitle className="text-xl font-semibold uppercase pb-">Create New Event</DialogTitle>
+                    <DialogTitle className="text-xl font-semibold uppercase pb-2">Edit Event</DialogTitle>
                     <DialogDescription>
-                        Fill in the details below to create a new event. Click create when you're done.
+                        Make changes to your event here. Click save when you're done.
                     </DialogDescription>
                 </DialogHeader>
 
-                <form onSubmit={(e) => {
-                    e.preventDefault();
-                    createEvent(newEvent);
-                }} className="space-y-6">
+                <form
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        updateEvent(updatedEvent);
+                    }}
+                    className="space-y-6"
+                >
                     <div className="space-y-4">
                         <div className="space-y-2">
                             <Label htmlFor="name" className="text-sm font-medium">
@@ -44,9 +68,10 @@ const CreateEventModal = ({ newEvent, setNewEvent, isLoading, createEvent }) => 
                             </Label>
                             <Input
                                 id="name"
-                                placeholder="Enter event name"
-                                value={newEvent.name}
-                                onChange={(e) => setNewEvent({ ...newEvent, name: e.target.value })}
+                                value={updatedEvent.name}
+                                onChange={(e) =>
+                                    setUpdatedEvent({ ...updatedEvent, name: e.target.value })
+                                }
                                 className="w-full"
                                 required
                             />
@@ -60,9 +85,10 @@ const CreateEventModal = ({ newEvent, setNewEvent, isLoading, createEvent }) => 
                                 <Input
                                     id="date"
                                     type="date"
-                                    placeholder='DD-MMM-YYYY'
-                                    value={newEvent.date}
-                                    onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
+                                    value={updatedEvent.date}
+                                    onChange={(e) =>
+                                        setUpdatedEvent({ ...updatedEvent, date: e.target.value })
+                                    }
                                     className="w-full pl-10"
                                     required
                                 />
@@ -76,9 +102,10 @@ const CreateEventModal = ({ newEvent, setNewEvent, isLoading, createEvent }) => 
                                 <MapPinIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
                                 <Input
                                     id="location"
-                                    placeholder="Enter location"
-                                    value={newEvent.location}
-                                    onChange={(e) => setNewEvent({ ...newEvent, location: e.target.value })}
+                                    value={updatedEvent.location}
+                                    onChange={(e) =>
+                                        setUpdatedEvent({ ...updatedEvent, location: e.target.value })
+                                    }
                                     className="w-full pl-10"
                                     required
                                 />
@@ -93,9 +120,10 @@ const CreateEventModal = ({ newEvent, setNewEvent, isLoading, createEvent }) => 
                                 <Input
                                     id="maxAttendees"
                                     type="number"
-                                    placeholder="Enter max attendees"
-                                    value={newEvent.maxAttendees}
-                                    onChange={(e) => setNewEvent({ ...newEvent, maxAttendees: Number(e.target.value) })}
+                                    value={updatedEvent.maxAttendees}
+                                    onChange={(e) =>
+                                        setUpdatedEvent({ ...updatedEvent, maxAttendees: Number(e.target.value) })
+                                    }
                                     className="w-full pl-10"
                                     required
                                 />
@@ -107,9 +135,8 @@ const CreateEventModal = ({ newEvent, setNewEvent, isLoading, createEvent }) => 
                         <Button
                             type="submit"
                             className="w-full"
-                            disabled={isLoading}
                         >
-                            {isLoading ? 'Creating...' : "Create Event"}
+                            Save Changes
                         </Button>
                         <DialogClose asChild>
                             <Button type="button" variant="outline" className="w-full mt-2">
@@ -123,5 +150,4 @@ const CreateEventModal = ({ newEvent, setNewEvent, isLoading, createEvent }) => 
     );
 };
 
-export default CreateEventModal;
-
+export default EditEventModal;

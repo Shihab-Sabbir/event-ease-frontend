@@ -20,7 +20,7 @@ export const apiCall = async (url, method = "GET", data = null) => {
     };
 
     try {
-        const response = await fetch(`http://localhost:5000/api/v1${url}`, options);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/v1${url}`, options);
 
         const responseBody = await response.json();
         if (!response.ok) {
