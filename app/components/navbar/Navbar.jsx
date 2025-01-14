@@ -8,7 +8,7 @@ import { useUser } from "@/app/context/UserContext";
 import { Menu, LogOut, LogIn, Home, Calendar } from "lucide-react";
 
 export default function Navbar() {
-    const { user, logout, checkUser } = useUser();
+    const { user, logout, checkUser, loading } = useUser();
 
     useEffect(() => {
         const checkUserStatus = async () => {
@@ -53,12 +53,15 @@ export default function Navbar() {
 
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex ml-auto space-x-6 items-center">
-                <Link href="/" className="nav-link">
-                    Home
-                </Link>
-                <Link href="/all-events" className="nav-link">
-                    All Events
-                </Link>
+
+                {(user?.email && !loading) && <div className="space-x-6">
+                    <Link href="/" className="nav-link">
+                        Home
+                    </Link>
+                    <Link href="/all-events" className="nav-link">
+                        All Events
+                    </Link>
+                </div>}
 
                 {/* Conditional User Actions */}
                 {user ? (
